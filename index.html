@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>小玻璃瓶</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--pk:#F3AEC7;--pk2:#F7DCE9;--lv:#E6DDF5;--sky:#D9ECFA;--cr:#FFFDF9;--ink:#645978;--soft:#9a8fb0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;color:var(--ink);font:16px/1.6 "LXGW WenKai TC","PingFang TC","Noto Sans TC",sans-serif}
+body{background:linear-gradient(170deg,#f9dfeb 0%,#e9dff6 48%,#d6e9f8 100%) fixed;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+body:before,body:after{content:"";position:fixed;border-radius:50%;filter:blur(40px);z-index:-1;pointer-events:none}
+body:before{width:260px;height:260px;left:-80px;top:8%;background:#fff8;}
+body:after{width:300px;height:300px;right:-100px;bottom:6%;background:#ffe9f3aa}
+main{max-width:430px;margin:0 auto;padding:20px 22px 40px;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+h1{font-size:28px;margin:18px 0 4px;letter-spacing:.06em;font-weight:700}
+.sub{color:var(--soft);font-size:13px;margin:0}
+button{font:inherit;color:var(--ink);cursor:pointer;border:1px solid #fffc;background:#ffffffa6;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:24px;padding:13px 22px;box-shadow:0 6px 22px #b79fd033;transition:transform .15s,box-shadow .15s}
+button:active{transform:scale(.96);box-shadow:0 2px 10px #f3aec766}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--pk);outline-offset:2px}
+button.main{background:linear-gradient(135deg,#f7b9cf,#d8c6f0);border-color:#fff;color:#fff;font-weight:700;text-shadow:0 1px 6px #a876c055}
+button[disabled]{opacity:.45}
+input,textarea{font:inherit;color:var(--ink);width:100%;padding:12px 16px;border:1px solid #fffd;background:#ffffffb8;border-radius:18px}
+textarea{resize:none;height:110px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
+.stack{display:flex;flex-direction:column;gap:12px;width:100%;align-items:stretch;margin-top:20px}
+.cd{font-size:15px;margin:2px 0 14px;color:var(--ink)}
+.cd b{font-size:22px;font-weight:700;letter-spacing:.04em}
+#bottle{width:min(62vw,260px);margin:4px 0 0;filter:drop-shadow(0 18px 18px #b99bd455)}
+#bottle .sp{animation:fl 6s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-9px);opacity:.4}}
+.wave{width:min(62vw,250px);height:18px;margin:-12px 0 14px;opacity:.7}
+.sheet{position:fixed;inset:0;background:#e9dff6ee;backdrop-filter:blur(8px);overflow:auto;z-index:5;padding:max(18px,env(safe-area-inset-top)) 20px 40px;animation:up .45s ease}
+@keyframes up{from{opacity:0;transform:translateY(14px)}}
+.sheet .in{max-width:430px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.paper{background:var(--cr);padding:18px 18px 16px;margin:18px 0;border-radius:6px 14px 8px 12px;box-shadow:0 8px 20px #a58ac433;position:relative;transform:rotate(-.7deg)}
+.paper:nth-child(even){transform:rotate(.8deg);background:#fff4f8}
+.paper:before{content:"";position:absolute;top:-10px;left:42%;width:70px;height:20px;background:#f3aec766;transform:rotate(-3deg);border-radius:3px}
+.paper img{width:100%;border-radius:8px;display:block}
+.paper p{margin:6px 0;white-space:pre-wrap;word-break:break-word}
+.mood{display:inline-block;font-size:13px;padding:1px 12px;border-radius:12px;background:var(--lv);margin-bottom:4px}
+.rp{font-size:14px;color:var(--soft);border-left:3px solid var(--pk2);padding-left:10px;margin:6px 0}
+.mini{padding:7px 14px;font-size:14px;box-shadow:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{padding:5px 14px;font-size:14px;box-shadow:none}
+.chips button.on{background:var(--pk);color:#fff}
+canvas{width:100%;aspect-ratio:3/2;border-radius:16px;background:var(--cr);touch-action:none;box-shadow:inset 0 0 0 1px #e6ddf5}
+.dot{width:26px;height:26px;padding:0;border-radius:50%}
+.toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#645978e6;color:#fff;padding:10px 20px;border-radius:20px;z-index:9;font-size:14px}
+.ht{position:fixed;bottom:12%;color:var(--pk);z-index:8;pointer-events:none;font-style:normal;opacity:.9;animation:rise 2.2s ease-out forwards}@keyframes rise{to{transform:translateY(-55vh) rotate(18deg);opacity:0}}
+.err{color:#c25a7c;font-size:14px;min-height:20px;margin:0}
+#hide{position:fixed;top:max(10px,env(safe-area-inset-top));right:12px;width:26px;height:26px;padding:0;border-radius:50%;opacity:.35;box-shadow:none;z-index:4}
+#calc{position:fixed;inset:0;background:#1c1c1e;z-index:99;display:flex;flex-direction:column;justify-content:flex-end;padding:20px 14px calc(24px + env(safe-area-inset-bottom));font-family:-apple-system,"Helvetica Neue",sans-serif}
+#calc .out{color:#fff;text-align:right;font-size:64px;font-weight:300;padding:0 10px 14px;word-break:break-all;line-height:1.1;min-height:70px}
+#calc .g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:430px;width:100%;margin:0 auto}
+#calc button{border:0;border-radius:50%;aspect-ratio:1;font-size:28px;padding:0;background:#333336;color:#fff;box-shadow:none;backdrop-filter:none}
+#calc button.o{background:#ff9f0a}#calc button.f{background:#a5a5a5;color:#000}#calc button.z{grid-column:span 2;aspect-ratio:auto;border-radius:40px;text-align:left;padding-left:30px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div id="calc" hidden></div>
+<script>
+const U='https://qnlqilixrlvspiaoilub.supabase.co/rest/v1/rpc/',K='sb_publishable_FdkJhUkN-G4zgIDajQTXMw_cPfduccP';
+const rpc=(f,a)=>fetch(U+f,{method:'POST',headers:{apikey:K,'Content-Type':'application/json'},body:JSON.stringify(a)}).then(r=>r.json());
+const $=s=>document.querySelector(s),e=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const LS=localStorage,MOODS=['開心','想你','加油','難過','害羞','感謝','疲累','愛心'];
+const PR=['今天最開心的一件小事','今天吃了什麼好吃的','最近一直想跟你說的一件事','今天有點累的話，可以在這裡說','這週你做得很好的一件事','最近聽到的一首歌','今天看到什麼，讓你想到我'];let me=LS.who,pw=LS.pw,ot=me==='Sean'?'Fifi':'Sean',st={},tgt=0,sheet=null;
+const img=d=>d&&d.startsWith('data:image/png;base64,')?`<img src="${e(d)}" alt="手繪">`:'';
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),1800)}
+
+/* ---- bottle ---- */
+function bottle(n){
+ const C=['#F7B9CF','#D8C6F0','#FFEFC2','#BFE0F5'];let s='';
+ for(let i=0;i<Math.min(n,21);i++){const c=i%3,r=(i/3)|0,x=60+c*28+(r%2)*7,y=366-r*21,a=(i*37%34)-17;
+  s+=`<g transform="rotate(${a} ${x+13} ${y+7})"><rect x="${x}" y="${y}" width="27" height="14" rx="7" fill="${C[i%4]}" stroke="#fff9" stroke-width="1"/><rect x="${x+11}" y="${y}" width="3" height="14" fill="#c7a46a99"/></g>`}
+ let sp='';[[70,150,2],[128,190,1.6],[96,250,2.2],[118,310,1.4],[78,330,1.6]].forEach(([x,y,r],i)=>sp+=`<circle class="sp" style="animation-delay:${i*-1.1}s" cx="${x}" cy="${y}" r="${r}" fill="#fff"/>`);
+ const P='M76 40h48v42c0 12 26 18 26 44v240c0 18-14 30-30 30H80c-16 0-30-12-30-30V126c0-26 26-32 26-44z';
+ return `<svg id="bottle" viewBox="0 0 200 420" style="transform:rotate(8deg)" role="img" aria-label="玻璃瓶，裡面有 ${n} 張紙條">
+<defs><clipPath id="cp"><path d="${P}"/></clipPath>
+<linearGradient id="gl" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".62"/><stop offset=".45" stop-color="#f3e8ff" stop-opacity=".16"/><stop offset="1" stop-color="#dbeeff" stop-opacity=".5"/></linearGradient>
+<radialGradient id="wm" cx=".5" cy="1" r=".8"><stop offset="0" stop-color="#ffe7a8" stop-opacity=".8"/><stop offset="1" stop-color="#ffe7a8" stop-opacity="0"/></radialGradient>
+<linearGradient id="ck" x1="0" x2="1"><stop offset="0" stop-color="#e4c598"/><stop offset=".6" stop-color="#d2ad7b"/><stop offset="1" stop-color="#bd9566"/></linearGradient></defs>
+<ellipse cx="100" cy="404" rx="62" ry="9" fill="#9b82c133"/>
+<g clip-path="url(#cp)"><rect x="40" y="30" width="120" height="380" fill="url(#gl)"/><rect x="40" y="200" width="120" height="210" fill="url(#wm)"/>
+<path d="M50 372q25-9 50 0t50 0v30H50z" fill="#f8ebdd"/><circle cx="72" cy="384" r="4" fill="#f6c9d6"/><path d="M124 388l6-5 6 5z" fill="#f3d9c4"/>${s}${sp}</g>
+<path d="${P}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="2.4"/>
+<path d="M54 134v220" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".6"/><path d="M146 150v150" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".9"/>
+<path d="M80 52v22" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/><path d="M58 378q42 17 84 0" fill="none" stroke="#f7c8f0" stroke-width="2" opacity=".6"/>
+<rect x="72" y="14" width="56" height="34" rx="8" fill="url(#ck)"/><path d="M80 24h12M104 20h16M84 34h22M112 38h10" stroke="#a9825199" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M74 64q26 9 52 0" fill="none" stroke="#F3AEC7" stroke-width="5" stroke-linecap="round"/><path d="M74 71q26 9 52 0" fill="none" stroke="#F3AEC7" stroke-width="4" stroke-linecap="round"/>
+<g fill="#f08fb2"><ellipse cx="90" cy="82" rx="12" ry="6" transform="rotate(-18 90 82)"/><ellipse cx="116" cy="82" rx="12" ry="6" transform="rotate(18 116 82)"/></g><circle cx="103" cy="82" r="4" fill="#e77aa2"/>
+<path d="M100 86q-4 22 4 34M106 86q8 18 14 28" fill="none" stroke="#f08fb2" stroke-width="2.4" stroke-linecap="round"/>
+<g transform="rotate(8 104 130)"><path d="M104 120v8" stroke="#d9b45c" stroke-width="1.5"/><rect x="82" y="128" width="46" height="22" rx="7" fill="#f4dc9a" stroke="#d1a847" stroke-width="1.5"/><circle cx="88" cy="133" r="2" fill="#fff" stroke="#d1a847" stroke-width=".8"/><text x="107" y="143.5" text-anchor="middle" font-size="11" fill="#7a5d1b" font-family="LXGW WenKai TC,sans-serif">${e(me)}</text></g></svg>
+<svg class="wave" viewBox="0 0 250 18"><path d="M10 9q30-14 60 0t60 0 60 0 50 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M40 14q25-8 50 0t50 0 50 0" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.6" stroke-linecap="round"/></svg>`}
+
+/* ---- screens ---- */
+function login(){
+ $('#app').innerHTML=`<h1>你是哪一位？</h1><p class="sub">選了就不能換囉</p>
+ <div class="stack"><div class="row"><button class="main" data-w="Sean">我是 Sean</button><button class="main" data-w="Fifi">我是 Fifi</button></div>
+ <input id="pw" type="password" placeholder="通關密語（第一次登入就是設定，至少 4 個字）" autocomplete="off"><p class="err" id="er"></p></div>`;
+ document.querySelectorAll('[data-w]').forEach(b=>b.onclick=async()=>{
+  const w=b.dataset.w,p=$('#pw').value;
+  if(!confirm(`確定是 ${w} 嗎？選了就不能換。`))return;
+  const r=await rpc('enter',{w,p});
+  if(r==='ok'||r==='new'){LS.who=me=w;LS.pw=pw=p;ot=w==='Sean'?'Fifi':'Sean';home()}
+  else $('#er').textContent=r==='short'?'密語至少要 4 個字':'密語不對，再試一次'});
+}
+const fmt=s=>{const d=(s/86400)|0,h=((s%86400)/3600)|0,m=((s%3600)/60)|0;return(d?`<b>${d}</b> 天 `:'')+`<b>${h}</b> 小時 <b>${m}</b> 分`};
+async function home(){
+ const s=await rpc('state',{w:me,p:pw});
+ if(s.err){delete LS.pw;return login()}
+ st=s;tgt=performance.now()+s.left*1000;
+ $('#app').innerHTML=`<h1>${e(me)} 的瓶子</h1><p class="sub">&nbsp;</p>${bottle(s.mine)}
+ <div class="cd" id="cd"></div>
+ ${s.theirs||s.pings?`<p class="sub" style="margin:-6px 0 14px;text-align:center">${[s.theirs?`${ot} 這週已經放了 ${s.theirs} 張進瓶子`:'',s.pings?`${ot} 這週想了你 ${s.pings} 次`:''].filter(Boolean).join('，')}</p>`:''}
+ <div class="stack" style="margin-top:0"><button class="main" id="wr">寫一張給 ${ot} 的紙條</button>
+ <button id="op">${s.open?`打開 ${ot} 的瓶子`:`${ot} 的瓶子還鎖著`}</button><button id="pg">想你一下</button><button id="fv">我的收藏</button></div>
+ ${s.mine?'':`<p class="sub" style="margin-top:16px">瓶子還空空的，今天想跟 ${ot} 說什麼？</p>`}
+ <button id="hide" aria-label="保密"></button>`;
+ $('#wr').onclick=write;$('#pg').onclick=ping;$('#op').onclick=openBottle;$('#fv').onclick=favs;$('#hide').onclick=()=>{LS.cm=Date.now()+5*36e5;calc()};
+ tick();
+}
+function tick(){
+ const el=$('#cd');if(!el)return;const s=Math.max(0,(tgt-performance.now())/1000);
+ if(s<=0&&el.dataset.z!=='1'){el.dataset.z='1';return home()}
+ el.innerHTML=st.open?`開瓶中，還剩 ${fmt(s)}`:`再 ${fmt(s)}，就能打開`;
+}
+setInterval(()=>{tick();if(LS.cm&&Date.now()<+LS.cm){if($('#calc').hidden)calc()}else if(!$('#calc').hidden)uncalc()},1000);
+
+function modal(html){close();sheet=document.createElement('div');sheet.className='sheet';sheet.innerHTML=`<div class="in">${html}</div>`;document.body.append(sheet)}
+function close(){sheet&&sheet.remove();sheet=null}
+
+function write(){
+ let mood='',pen='#645978',drew=false,mode='t';
+ modal(`<div class="top"><b>給 ${ot} 的紙條</b><button class="mini" id="x">返回</button></div>
+ <div class="row" style="margin-bottom:12px"><button class="mini" id="mt">寫一張</button><button class="mini" id="md">畫一張</button></div>
+ <textarea id="tx" maxlength="100" placeholder="想說什麼都可以"></textarea><button class="mini" id="ps" style="margin-top:8px">不知道寫什麼？</button>
+ <div id="dw" hidden><canvas id="cv" width="600" height="400"></canvas><div class="row" style="margin-top:8px;align-items:center">${['#645978','#F3AEC7','#8fc4ec','#f2c46d','#9bd3ae'].map(c=>`<button class="dot" data-c="${c}" style="background:${c}"></button>`).join('')}<button class="mini" id="cl">擦掉重畫</button></div></div>
+ <p class="sub" style="margin:14px 0 6px">現在的心情</p><div class="chips" id="mo">${MOODS.map(m=>`<button data-m="${m}">${m}</button>`).join('')}</div>
+ <p class="err" id="er"></p><button class="main" style="width:100%;margin-top:6px" id="go">放進瓶子</button>`);
+ $('#x').onclick=close;
+ const cv=$('#cv'),g=cv.getContext('2d');g.lineCap=g.lineJoin='round';g.lineWidth=6;
+ const sw=m=>{mode=m;$('#tx').hidden=m==='d';$('#dw').hidden=m==='t'};$('#mt').onclick=()=>sw('t');$('#md').onclick=()=>sw('d');
+ document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>pen=b.dataset.c);
+ $('#ps').onclick=()=>{$('#tx').placeholder=PR[Math.random()*PR.length|0]};
+ $('#cl').onclick=()=>{g.clearRect(0,0,600,400);drew=false};
+ let dn=0;const pt=ev=>{const r=cv.getBoundingClientRect();return[(ev.clientX-r.left)*600/r.width,(ev.clientY-r.top)*400/r.height]};
+ cv.onpointerdown=ev=>{dn=1;cv.setPointerCapture(ev.pointerId);g.strokeStyle=pen;g.beginPath();g.moveTo(...pt(ev));g.lineTo(...pt(ev));g.stroke();drew=true};
+ cv.onpointermove=ev=>{if(dn){g.lineTo(...pt(ev));g.stroke()}};cv.onpointerup=()=>dn=0;
+ document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mood=mood===b.dataset.m?'':b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x.dataset.m===mood))});
+ $('#go').onclick=async()=>{
+  const b=$('#tx').value.trim(),d=mode==='d'&&drew?cv.toDataURL('image/png'):null;
+  if(!b&&!d)return $('#er').textContent='還沒有內容喔';
+  const r=await rpc('add_note',{w:me,p:pw,b:mode==='d'?'':b,m:mood||null,d});
+  if(r==='ok'){close();hearts();toast('放進去了');home()}else $('#er').textContent=r==='long'?'內容太長了':'送不出去，再試一次'};
+}
+
+async function openBottle(){
+ const o=await rpc('opened',{w:me,p:pw});
+ if(o.locked)return toast(`${ot} 的瓶子還鎖著，週六晚上 8 點一起打開`);
+ if(o.err)return;
+ let left=o.favleft;
+ modal(`<div class="top"><b>8 點到了，看看 ${ot} 這週留給你的話</b><button class="mini" id="x">返回</button></div>
+ <p class="sub" id="fl">這次還能收藏 ${left} 張</p>
+ ${o.notes.length?o.notes.map(n=>`<div class="paper" data-id="${n.id}">${n.mood?`<span class="mood">${e(n.mood)}</span>`:''}${img(n.doodle)}${n.body?`<p>${e(n.body)}</p>`:''}
+ ${n.rp.map(r=>`<div class="rp">${e(r.a)}：${e(r.b)}</div>`).join('')}
+ <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="mini fv">${n.fav?'已收藏':'收藏這張'}</button></div>
+ <div class="row" style="flex-wrap:nowrap;margin-top:8px"><input maxlength="200" placeholder="回 ${ot} 一句"><button class="mini rs">送出</button></div></div>`).join('')
+ :`<p class="sub">${ot} 這週沒有留下紙條</p>`}
+ ${o.replied.length?`<p class="sub">${ot} 回你的話</p>${o.replied.map(r=>`<div class="rp">${e(r.b)}</div>`).join('')}`:''}`);
+ $('#x').onclick=close;
+ hearts();sheet.querySelectorAll('.paper').forEach(p=>{const id=p.dataset.id;
+  p.querySelector('.fv').onclick=async ev=>{const r=await fav_(id);const b=ev.target;
+   if(r==='on'){b.textContent='已收藏';left--}else if(r==='off'){b.textContent='收藏這張';left++}else if(r==='limit')toast('這次的 2 張都收藏了');
+   $('#fl').textContent=`這次還能收藏 ${left} 張`};
+  p.querySelector('.rs').onclick=async()=>{const i=p.querySelector('input');if(!i.value.trim())return;
+   const r=await rpc('reply',{w:me,p:pw,nid:+id,b:i.value.trim()});
+   if(r==='ok'){const d=document.createElement('div');d.className='rp';d.textContent=me+'：'+i.value;p.insertBefore(d,p.querySelector('.row'));i.value=''}else toast('送不出去，再試一次')}});
+}
+const fav_=id=>rpc('fav',{w:me,p:pw,nid:+id});
+
+async function favs(){
+ const l=await rpc('favlist',{w:me,p:pw});
+ modal(`<div class="top"><b>我的收藏</b><button class="mini" id="x">返回</button></div>
+ ${l.length?l.map(n=>`<div class="paper">${n.m?`<span class="mood">${e(n.m)}</span>`:''}${img(n.d)}${n.b?`<p>${e(n.b)}</p>`:''}<p class="sub">第 ${n.wk} 週</p></div>`).join(''):'<p class="sub">還沒有收藏的紙條</p>'}`);
+ $('#x').onclick=close;
+}
+
+async function ping(){const r=await rpc('ping',{w:me,p:pw});if(r==='ok'){hearts();toast(`${ot} 會知道你想了一下`)}else toast('這次沒送出去')}
+function hearts(){for(let i=0;i<14;i++){const h=document.createElement('i');h.className='ht';h.textContent='♥';h.style.cssText=`left:${10+Math.random()*80}%;animation-delay:${Math.random()*.5}s;font-size:${14+Math.random()*18}px`;document.body.append(h);setTimeout(()=>h.remove(),2800)}}
+
+/* ---- calculator (privacy mode, 5 hours) ---- */
+let ex='';
+function calc(){
+ const c=$('#calc');c.hidden=false;document.title='計算機';
+ c.innerHTML=`<div class="out" id="out">0</div><div class="g">${['AC','±','%','÷','7','8','9','×','4','5','6','−','1','2','3','+','0','.','='].map(k=>`<button class="${'÷×−+='.includes(k)?'o':'AC±%'.includes(k)&&k.length<3&&'AC±%'.split('').includes(k)||k==='AC'?'f':''} ${k==='0'?'z':''}" data-k="${k}">${k}</button>`).join('')}</div>`;
+ c.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k,o=$('#out');
+  if(k==='AC')ex='';else if(k==='=')try{const v=Function('"use strict";return('+ex.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/%/g,'/100')+')')();ex=String(+(+v).toPrecision(10))}catch(_){ex='錯誤'}
+  else if(k==='±')ex=ex.startsWith('-')?ex.slice(1):'-'+ex;else ex=(ex==='錯誤'?'':ex)+k;
+  o.textContent=ex||'0'});
+}
+function uncalc(){$('#calc').hidden=true;document.title='小玻璃瓶';delete LS.cm;ex=''}
+
+if(LS.cm&&Date.now()<+LS.cm)calc();else delete LS.cm;
+me&&pw?home():login();
+</script>
+</body>
+</html>
