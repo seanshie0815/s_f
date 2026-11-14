@@ -109,7 +109,7 @@ function login(){
   if(!confirm(`確定是 ${w} 嗎？選了就不能換。`))return;
   const r=await rpc('enter',{w,p});
   if(r==='ok'||r==='new'){LS.who=me=w;LS.pw=pw=p;ot=w==='Sean'?'Fifi':'Sean';home()}
-  else $('#er').textContent=r==='short'?'密語至少要 4 個字':'密語不對，再試一次'});
+  else $('#er').textContent=r==='short'?'密語至少要 4 個字':r==='wrong'?'密語不對，再試一次':'資料庫還沒準備好：'+((r&&(r.message||r.hint))||'連不上')});
 }
 const fmt=s=>{const d=(s/86400)|0,h=((s%86400)/3600)|0,m=((s%3600)/60)|0;return(d?`<b>${d}</b> 天 `:'')+`<b>${h}</b> 小時 <b>${m}</b> 分`};
 async function home(){
