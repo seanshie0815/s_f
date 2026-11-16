@@ -59,6 +59,24 @@ canvas{width:100%;aspect-ratio:3/2;border-radius:16px;background:var(--cr);touch
 #calc .g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:430px;width:100%;margin:0 auto}
 #calc button{border:0;border-radius:50%;aspect-ratio:1;font-size:28px;padding:0;background:#333336;color:#fff;box-shadow:none;backdrop-filter:none}
 #calc button.o{background:#ff9f0a}#calc button.f{background:#a5a5a5;color:#000}#calc button.z{grid-column:span 2;aspect-ratio:auto;border-radius:40px;text-align:left;padding-left:30px}
+/* handmade look: paper, ink outlines, hard shadows */
+:root{--ink:#4a3f3a;--soft:#8c7f78;--pk:#ee9fb8;--pk2:#f9d9e3;--cr:#fffaf2}
+body{background:#f7efe4 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .3 0 0 0 0 .25 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E") fixed}
+body:before,body:after{display:none}
+button{background:var(--cr);color:var(--ink);border:2px solid var(--ink);border-radius:14px 22px 16px 24px/22px 14px 24px 16px;box-shadow:3px 3px 0 var(--ink);backdrop-filter:none;-webkit-backdrop-filter:none}
+button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+button.main{background:var(--pk);color:var(--ink);text-shadow:none}
+button.mini{box-shadow:2px 2px 0 var(--ink)}
+.chips button.on{background:var(--pk);color:var(--ink)}
+input,textarea{background:var(--cr);border:2px solid var(--ink);border-radius:10px 16px 12px 18px}
+h1{letter-spacing:.02em;transform:rotate(-1deg)}
+.sheet{background:#f7efe4;backdrop-filter:none}
+.paper{border:1px solid #e6d6c0;box-shadow:2px 3px 0 #4a3f3a33}
+.paper:before{background:#f3c969aa}
+.mood{background:#fbe3a8;border:1.5px solid var(--ink);transform:rotate(-2deg)}
+.dot{box-shadow:2px 2px 0 var(--ink)}
+#bottle{filter:drop-shadow(3px 5px 0 #4a3f3a22)}
+.toast{background:var(--ink)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -72,6 +90,7 @@ const $=s=>document.querySelector(s),e=s=>String(s??'').replace(/[&<>"']/g,c=>'&
 const LS=localStorage,MOODS=['開心','想你','加油','難過','害羞','感謝','疲累','愛心'];
 const PR=['今天最開心的一件小事','今天吃了什麼好吃的','最近一直想跟你說的一件事','今天有點累的話，可以在這裡說','這週你做得很好的一件事','最近聽到的一首歌','今天看到什麼，讓你想到我'];let me=LS.who,pw=LS.pw,ot=me==='Sean'?'Fifi':'Sean',st={},tgt=0,sheet=null;
 const img=d=>d&&d.startsWith('data:image/png;base64,')?`<img src="${e(d)}" alt="手繪">`:'';
+const media=n=>(n.photo&&n.photo.startsWith('data:image/')?`<img src="${e(n.photo)}" alt="照片" style="margin-top:6px">`:'')+(n.voice&&n.voice.startsWith('data:audio/')?`<audio controls src="${e(n.voice)}" style="width:100%;margin-top:8px"></audio>`:'');
 function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),1800)}
 
 /* ---- bottle ---- */
@@ -142,6 +161,7 @@ function write(){
  <div class="row" style="margin-bottom:12px"><button class="mini" id="mt">寫一張</button><button class="mini" id="md">畫一張</button></div>
  <textarea id="tx" maxlength="100" placeholder="想說什麼都可以"></textarea><button class="mini" id="ps" style="margin-top:8px">不知道寫什麼？</button>
  <div id="dw" hidden><canvas id="cv" width="600" height="400"></canvas><div class="row" style="margin-top:8px;align-items:center">${['#645978','#F3AEC7','#8fc4ec','#f2c46d','#9bd3ae'].map(c=>`<button class="dot" data-c="${c}" style="background:${c}"></button>`).join('')}<button class="mini" id="cl">擦掉重畫</button></div></div>
+ <div class="row" style="margin-top:14px"><button class="mini" id="pb">加照片</button><button class="mini" id="vb">錄一段話</button></div><input type="file" id="pf" accept="image/*" hidden><div id="md2"></div>
  <p class="sub" style="margin:14px 0 6px">現在的心情</p><div class="chips" id="mo">${MOODS.map(m=>`<button data-m="${m}">${m}</button>`).join('')}</div>
  <p class="err" id="er"></p><button class="main" style="width:100%;margin-top:6px" id="go">放進瓶子</button>`);
  $('#x').onclick=close;
@@ -149,6 +169,16 @@ function write(){
  const sw=m=>{mode=m;$('#tx').hidden=m==='d';$('#dw').hidden=m==='t'};$('#mt').onclick=()=>sw('t');$('#md').onclick=()=>sw('d');
  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>pen=b.dataset.c);
  $('#ps').onclick=()=>{$('#tx').placeholder=PR[Math.random()*PR.length|0]};
+ let photo=null,voice=null,rec=null;
+ const showM=()=>{$('#md2').innerHTML=(photo?`<img src="${photo}" alt="" style="width:100%;border-radius:12px;margin-top:10px">`:'')+(voice?`<audio controls src="${voice}" style="width:100%;margin-top:10px"></audio>`:'')+(photo||voice?'<button class="mini" id="rm" style="margin-top:8px">拿掉照片和語音</button>':'');const r=$('#rm');if(r)r.onclick=()=>{photo=voice=null;showM()}};
+ $('#pb').onclick=()=>$('#pf').click();
+ $('#pf').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);photo=c.toDataURL('image/jpeg',.72);showM()};im.onerror=()=>toast('這張照片打不開');im.src=URL.createObjectURL(f)};
+ $('#vb').onclick=async()=>{if(rec){rec.stop();return}
+  try{const ms=await navigator.mediaDevices.getUserMedia({audio:true}),ch=[];let tm;rec=new MediaRecorder(ms,{audioBitsPerSecond:24000});const mt=rec.mimeType;
+   rec.ondataavailable=ev=>ch.push(ev.data);
+   rec.onstop=()=>{ms.getTracks().forEach(t=>t.stop());clearTimeout(tm);const fr=new FileReader();fr.onload=()=>{voice=fr.result;rec=null;$('#vb').textContent='重錄一段';showM()};fr.readAsDataURL(new Blob(ch,{type:mt}))};
+   rec.start();$('#vb').textContent='停止（最多 30 秒）';tm=setTimeout(()=>rec&&rec.stop(),30000)}
+  catch(_){rec=null;toast('無法使用麥克風')}};
  $('#cl').onclick=()=>{g.clearRect(0,0,600,400);drew=false};
  let dn=0;const pt=ev=>{const r=cv.getBoundingClientRect();return[(ev.clientX-r.left)*600/r.width,(ev.clientY-r.top)*400/r.height]};
  cv.onpointerdown=ev=>{dn=1;cv.setPointerCapture(ev.pointerId);g.strokeStyle=pen;g.beginPath();g.moveTo(...pt(ev));g.lineTo(...pt(ev));g.stroke();drew=true};
@@ -156,8 +186,8 @@ function write(){
  document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mood=mood===b.dataset.m?'':b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x.dataset.m===mood))});
  $('#go').onclick=async()=>{
   const b=$('#tx').value.trim(),d=mode==='d'&&drew?cv.toDataURL('image/png'):null;
-  if(!b&&!d)return $('#er').textContent='還沒有內容喔';
-  const r=await rpc('add_note',{w:me,p:pw,b:mode==='d'?'':b,m:mood||null,d});
+  if(!b&&!d&&!photo&&!voice)return $('#er').textContent='還沒有內容喔';
+  const r=await rpc('add_note',{w:me,p:pw,b:mode==='d'?'':b,m:mood||null,d,ph:photo,vo:voice});
   if(r==='ok'){close();hearts();toast('放進去了');home()}else $('#er').textContent=r==='long'?'內容太長了':'送不出去，再試一次'};
 }
 
@@ -168,7 +198,7 @@ async function openBottle(){
  let left=o.favleft;
  modal(`<div class="top"><b>8 點到了，看看 ${ot} 這週留給你的話</b><button class="mini" id="x">返回</button></div>
  <p class="sub" id="fl">這次還能收藏 ${left} 張</p>
- ${o.notes.length?o.notes.map(n=>`<div class="paper" data-id="${n.id}">${n.mood?`<span class="mood">${e(n.mood)}</span>`:''}${img(n.doodle)}${n.body?`<p>${e(n.body)}</p>`:''}
+ ${o.notes.length?o.notes.map(n=>`<div class="paper" data-id="${n.id}">${n.mood?`<span class="mood">${e(n.mood)}</span>`:''}${img(n.doodle)}${media(n)}${n.body?`<p>${e(n.body)}</p>`:''}
  ${n.rp.map(r=>`<div class="rp">${e(r.a)}：${e(r.b)}</div>`).join('')}
  <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="mini fv">${n.fav?'已收藏':'收藏這張'}</button></div>
  <div class="row" style="flex-wrap:nowrap;margin-top:8px"><input maxlength="200" placeholder="回 ${ot} 一句"><button class="mini rs">送出</button></div></div>`).join('')
@@ -188,7 +218,7 @@ const fav_=id=>rpc('fav',{w:me,p:pw,nid:+id});
 async function favs(){
  const l=await rpc('favlist',{w:me,p:pw});
  modal(`<div class="top"><b>我的收藏</b><button class="mini" id="x">返回</button></div>
- ${l.length?l.map(n=>`<div class="paper">${n.m?`<span class="mood">${e(n.m)}</span>`:''}${img(n.d)}${n.b?`<p>${e(n.b)}</p>`:''}<p class="sub">第 ${n.wk} 週</p></div>`).join(''):'<p class="sub">還沒有收藏的紙條</p>'}`);
+ ${l.length?l.map(n=>`<div class="paper">${n.m?`<span class="mood">${e(n.m)}</span>`:''}${img(n.d)}${media({photo:n.ph,voice:n.vo})}${n.b?`<p>${e(n.b)}</p>`:''}<p class="sub">第 ${n.wk} 週</p></div>`).join(''):'<p class="sub">還沒有收藏的紙條</p>'}`);
  $('#x').onclick=close;
 }
 
