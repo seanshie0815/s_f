@@ -77,6 +77,7 @@ h1{letter-spacing:.02em;transform:rotate(-1deg)}
 .dot{box-shadow:2px 2px 0 var(--ink)}
 #bottle{filter:drop-shadow(3px 5px 0 #4a3f3a22)}
 .toast{background:var(--ink)}
+.day{margin:8px 0 0;font-size:15px;letter-spacing:.08em;padding:1px 16px;border:1.5px dashed var(--ink);border-radius:12px;background:#fbe3a8;transform:rotate(-2deg)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -130,12 +131,13 @@ function login(){
   if(r==='ok'||r==='new'){LS.who=me=w;LS.pw=pw=p;ot=w==='Sean'?'Fifi':'Sean';home()}
   else $('#er').textContent=r==='short'?'密語至少要 4 個字':r==='wrong'?'密語不對，再試一次':'資料庫還沒準備好：'+((r&&(r.message||r.hint))||'連不上')});
 }
+const dayN=()=>{const[y,m,d]=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'}).split('-').map(Number);return Math.floor((Date.UTC(y,m-1,d)-Date.UTC(2024,11,8))/864e5)+1};
 const fmt=s=>{const d=(s/86400)|0,h=((s%86400)/3600)|0,m=((s%3600)/60)|0;return(d?`<b>${d}</b> 天 `:'')+`<b>${h}</b> 小時 <b>${m}</b> 分`};
 async function home(){
  const s=await rpc('state',{w:me,p:pw});
  if(s.err){delete LS.pw;return login()}
  st=s;tgt=performance.now()+s.left*1000;
- $('#app').innerHTML=`<h1>${e(me)} 的瓶子</h1><p class="sub">&nbsp;</p>${bottle(s.mine)}
+ $('#app').innerHTML=`<p class="day" id="dy">Day ${dayN()}</p><h1>${e(me)} 的瓶子</h1><p class="sub">&nbsp;</p>${bottle(s.mine)}
  <div class="cd" id="cd"></div>
  ${s.theirs||s.pings?`<p class="sub" style="margin:-6px 0 14px;text-align:center">${[s.theirs?`${ot} 這週已經放了 ${s.theirs} 張進瓶子`:'',s.pings?`${ot} 這週想了你 ${s.pings} 次`:''].filter(Boolean).join('，')}</p>`:''}
  <div class="stack" style="margin-top:0"><button class="main" id="wr">寫一張給 ${ot} 的紙條</button>
@@ -146,7 +148,7 @@ async function home(){
  tick();
 }
 function tick(){
- const el=$('#cd');if(!el)return;const s=Math.max(0,(tgt-performance.now())/1000);
+ const dy=$('#dy');if(dy)dy.textContent='Day '+dayN();const el=$('#cd');if(!el)return;const s=Math.max(0,(tgt-performance.now())/1000);
  if(s<=0&&el.dataset.z!=='1'){el.dataset.z='1';return home()}
  el.innerHTML=st.open?`開瓶中，還剩 ${fmt(s)}`:`再 ${fmt(s)}，就能打開`;
 }
